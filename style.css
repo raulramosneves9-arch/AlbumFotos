@@ -8,17 +8,24 @@
 /* ---------- 1. CORES ---------- */
 /* Variáveis: definimos a cor uma vez e usamos em vários lugares com var(--nome) */
 :root {
-  --fundo:        #f4f1ff;               /* cor de fundo da página */
-  --texto:        #1d1850;               /* cor das letras */
-  --texto-suave:  #5f5a93;               /* letras secundárias */
-  --azul:         #4f6bff;
-  --roxo:         #8b4dff;
-  --vidro:        rgba(255,255,255,.72); /* fundo dos cartões (meio transparente) */
-  --borda:        rgba(120,100,230,.22);
-  --campo:        rgba(255,255,255,.9);  /* fundo dos campos de digitar */
-  --sombra:       rgba(70,50,180,.22);
-  --brilho-1:     rgba(90,120,255,.35);  /* "manchas" de luz azul no fundo */
-  --brilho-2:     rgba(170,100,255,.32); /* "manchas" de luz roxa no fundo */
+  --fundo: #f4f1ff;
+  /* cor de fundo da página */
+  --texto: #1d1850;
+  /* cor das letras */
+  --texto-suave: #5f5a93;
+  /* letras secundárias */
+  --azul: #4f6bff;
+  --roxo: #8b4dff;
+  --vidro: rgba(255, 255, 255, .72);
+  /* fundo dos cartões (meio transparente) */
+  --borda: rgba(120, 100, 230, .22);
+  --campo: rgba(255, 255, 255, .9);
+  /* fundo dos campos de digitar */
+  --sombra: rgba(70, 50, 180, .22);
+  --brilho-1: rgba(90, 120, 255, .35);
+  /* "manchas" de luz azul no fundo */
+  --brilho-2: rgba(170, 100, 255, .32);
+  /* "manchas" de luz roxa no fundo */
   --degrade-texto: linear-gradient(90deg, #4f6bff, #9a4dff);
   color-scheme: light;
 }
@@ -26,17 +33,17 @@
 /* Se o celular/computador estiver no modo escuro, trocamos as cores */
 @media (prefers-color-scheme: dark) {
   :root {
-    --fundo:        #0c0a24;
-    --texto:        #f1eeff;
-    --texto-suave:  #a9a3e0;
-    --azul:         #7b93ff;
-    --roxo:         #b58cff;
-    --vidro:        rgba(34,28,86,.55);
-    --borda:        rgba(160,140,255,.25);
-    --campo:        rgba(12,10,40,.6);
-    --sombra:       rgba(0,0,0,.5);
-    --brilho-1:     rgba(70,100,255,.38);
-    --brilho-2:     rgba(150,80,255,.36);
+    --fundo: #0c0a24;
+    --texto: #f1eeff;
+    --texto-suave: #a9a3e0;
+    --azul: #7b93ff;
+    --roxo: #b58cff;
+    --vidro: rgba(34, 28, 86, .55);
+    --borda: rgba(160, 140, 255, .25);
+    --campo: rgba(12, 10, 40, .6);
+    --sombra: rgba(0, 0, 0, .5);
+    --brilho-1: rgba(70, 100, 255, .38);
+    --brilho-2: rgba(150, 80, 255, .36);
     --degrade-texto: linear-gradient(90deg, #9db0ff, #d2adff);
     color-scheme: dark;
   }
@@ -45,7 +52,8 @@
 
 /* ---------- 2. BASE DA PÁGINA ---------- */
 * {
-  box-sizing: border-box; /* o tamanho inclui padding e borda (mais fácil de calcular) */
+  box-sizing: border-box;
+  /* o tamanho inclui padding e borda (mais fácil de calcular) */
 }
 
 body {
@@ -65,7 +73,7 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(520px 520px at 8% 6%,   var(--brilho-1), transparent 70%),
+    radial-gradient(520px 520px at 8% 6%, var(--brilho-1), transparent 70%),
     radial-gradient(560px 560px at 95% 38%, var(--brilho-2), transparent 70%),
     radial-gradient(520px 520px at 20% 98%, var(--brilho-1), transparent 70%);
 }
@@ -89,17 +97,19 @@ header {
 
 /* Título grande com letras em degradê azul → roxo */
 h1 {
-  font: italic 500 clamp(3rem, 13vw, 5.6rem)/1 "Cormorant Garamond", Georgia, serif;
+  font: 400 clamp(3.6rem, 16vw, 6.5rem)/1.15 "Great Vibes", cursive;
   margin: 0;
-  padding: .05em .12em;
+  padding: .1em .2em;
   background: var(--degrade-texto);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   outline: none;
 }
+
 h1:focus {
-  box-shadow: 0 2px 0 var(--roxo); /* sublinhado quando você clica para editar */
+  box-shadow: 0 2px 0 var(--roxo);
+  /* sublinhado quando você clica para editar */
 }
 
 .frase {
@@ -127,7 +137,8 @@ button {
   font: 600 1rem Figtree, sans-serif;
   cursor: pointer;
   border: 0;
-  border-radius: 999px; /* deixa o botão bem arredondado */
+  border-radius: 999px;
+  /* deixa o botão bem arredondado */
   padding: 13px 28px;
 }
 
@@ -161,39 +172,46 @@ main {
 
 .cartao {
   border-radius: 30px;
-  overflow: hidden; /* corta a foto nos cantos arredondados */
+  overflow: hidden;
+  /* corta a foto nos cantos arredondados */
   background: var(--vidro);
   border: 1px solid var(--borda);
-  backdrop-filter: blur(18px); /* efeito de vidro fosco */
+  backdrop-filter: blur(18px);
+  /* efeito de vidro fosco */
   -webkit-backdrop-filter: blur(18px);
   box-shadow: 0 24px 60px var(--sombra);
 }
 
 /* Área da foto */
 .foto {
-  position: relative; /* para podermos colocar o texto "em cima" da foto */
+  position: relative;
+  /* para podermos colocar o texto "em cima" da foto */
   aspect-ratio: 4 / 5;
   max-height: 680px;
   width: 100%;
   background: #241d5c;
 }
+
 .foto img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* a foto preenche o espaço sem esticar */
+  object-fit: cover;
+  /* a foto preenche o espaço sem esticar */
   display: block;
 }
+
 /* Sombra roxa escura na parte de baixo da foto, para a letra branca aparecer */
 .foto::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(14,8,56,.9) 0%, rgba(40,20,110,.35) 38%, transparent 62%);
+  background: linear-gradient(to top, rgba(14, 8, 56, .9) 0%, rgba(40, 20, 110, .35) 38%, transparent 62%);
 }
 
 /* Data + local + mini local */
 .info {
-  position: absolute; /* fixa embaixo, em cima da foto */
+  position: absolute;
+  /* fixa embaixo, em cima da foto */
   left: 0;
   right: 0;
   bottom: 0;
@@ -206,6 +224,7 @@ main {
 .sem-foto {
   padding: 30px 26px 6px;
 }
+
 .sem-foto .info {
   position: static;
   padding: 0;
@@ -217,10 +236,11 @@ main {
   font: 500 .85rem Figtree, sans-serif;
   padding: 5px 14px;
   border-radius: 999px;
-  background: rgba(255,255,255,.18);
-  border: 1px solid rgba(255,255,255,.3);
+  background: rgba(255, 255, 255, .18);
+  border: 1px solid rgba(255, 255, 255, .3);
   margin: 0 0 10px;
 }
+
 .sem-foto .data {
   background: var(--campo);
   border-color: var(--borda);
@@ -240,6 +260,7 @@ main {
   opacity: .9;
   font-size: .98rem;
 }
+
 .mini-local svg {
   width: 15px;
   height: 15px;
@@ -250,8 +271,10 @@ main {
 .conteudo {
   padding: 22px 26px 20px;
 }
+
 .texto {
-  white-space: pre-wrap; /* respeita as quebras de linha que você digitou */
+  white-space: pre-wrap;
+  /* respeita as quebras de linha que você digitou */
   margin: 0;
   font: italic 400 1.3rem/1.55 "Cormorant Garamond", Georgia, serif;
 }
@@ -262,6 +285,7 @@ main {
   display: flex;
   gap: 16px;
 }
+
 .acoes button {
   padding: 0;
   background: none;
@@ -279,6 +303,7 @@ main {
   justify-content: center;
   padding: 26px 0;
 }
+
 .separador svg {
   width: 20px;
   height: 20px;
@@ -305,10 +330,12 @@ dialog {
   max-height: 92vh;
   background: var(--fundo);
   color: var(--texto);
-  box-shadow: 0 40px 90px rgba(10,5,60,.55);
+  box-shadow: 0 40px 90px rgba(10, 5, 60, .55);
 }
-dialog::backdrop { /* o fundo escurecido atrás da janela */
-  background: rgba(12,8,50,.62);
+
+dialog::backdrop {
+  /* o fundo escurecido atrás da janela */
+  background: rgba(12, 8, 50, .62);
   backdrop-filter: blur(4px);
 }
 
@@ -345,19 +372,23 @@ textarea {
   padding: 11px 13px;
   width: 100%;
 }
+
 textarea {
   min-height: 110px;
   resize: vertical;
 }
 
-.linha { /* data e local lado a lado */
+.linha {
+  /* data e local lado a lado */
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
-#previa { /* miniatura da foto escolhida */
-  display: none; /* o JavaScript mostra quando houver foto */
+#previa {
+  /* miniatura da foto escolhida */
+  display: none;
+  /* o JavaScript mostra quando houver foto */
   max-height: 210px;
   width: 100%;
   object-fit: cover;
@@ -383,5 +414,93 @@ textarea {
 @media (max-width: 520px) {
   .linha {
     grid-template-columns: 1fr;
+  }
+}
+
+/* =====================================================
+   FOTOS EM 2 COLUNAS
+   ===================================================== */
+
+main {
+  max-width: 980px;
+  /* mais largo, para caberem 2 cartões lado a lado */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  /* 2 colunas do mesmo tamanho */
+  gap: 22px;
+  /* espaço entre os cartões */
+  align-items: start;
+  /* cada cartão tem a altura do próprio conteúdo */
+}
+
+/* Os corações entre as fotos não fazem sentido em colunas, então escondemos */
+.separador {
+  display: none;
+}
+
+/* A mensagem de "álbum vazio" ocupa as duas colunas */
+.vazio {
+  grid-column: 1 / -1;
+}
+
+/* Como os cartões ficaram mais estreitos, diminuímos um pouco as letras */
+.cartao {
+  border-radius: 24px;
+}
+
+.info {
+  padding: 18px;
+}
+
+.data {
+  font-size: .75rem;
+  padding: 4px 11px;
+}
+
+.local {
+  font-size: clamp(1.4rem, 3.4vw, 2rem);
+}
+
+.mini-local {
+  font-size: .85rem;
+}
+
+.conteudo {
+  padding: 16px 18px 16px;
+}
+
+.texto {
+  font-size: 1.1rem;
+}
+
+/* No celular, mantém 2 colunas, só que mais compactas */
+@media (max-width: 520px) {
+  main {
+    gap: 12px;
+    padding: 6px 12px 80px;
+  }
+
+  .cartao {
+    border-radius: 18px;
+  }
+
+  .info {
+    padding: 12px;
+  }
+
+  .local {
+    font-size: 1.15rem;
+  }
+
+  .mini-local {
+    font-size: .75rem;
+  }
+
+  .conteudo {
+    padding: 12px;
+  }
+
+  .texto {
+    font-size: .95rem;
   }
 }
