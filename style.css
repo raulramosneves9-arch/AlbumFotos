@@ -1,0 +1,387 @@
+/* =====================================================
+   ESTILO DO ÁLBUM
+   Dica: para mudar as cores do site inteiro, mexa só
+   na seção "1. CORES" logo abaixo.
+   ===================================================== */
+
+
+/* ---------- 1. CORES ---------- */
+/* Variáveis: definimos a cor uma vez e usamos em vários lugares com var(--nome) */
+:root {
+  --fundo:        #f4f1ff;               /* cor de fundo da página */
+  --texto:        #1d1850;               /* cor das letras */
+  --texto-suave:  #5f5a93;               /* letras secundárias */
+  --azul:         #4f6bff;
+  --roxo:         #8b4dff;
+  --vidro:        rgba(255,255,255,.72); /* fundo dos cartões (meio transparente) */
+  --borda:        rgba(120,100,230,.22);
+  --campo:        rgba(255,255,255,.9);  /* fundo dos campos de digitar */
+  --sombra:       rgba(70,50,180,.22);
+  --brilho-1:     rgba(90,120,255,.35);  /* "manchas" de luz azul no fundo */
+  --brilho-2:     rgba(170,100,255,.32); /* "manchas" de luz roxa no fundo */
+  --degrade-texto: linear-gradient(90deg, #4f6bff, #9a4dff);
+  color-scheme: light;
+}
+
+/* Se o celular/computador estiver no modo escuro, trocamos as cores */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo:        #0c0a24;
+    --texto:        #f1eeff;
+    --texto-suave:  #a9a3e0;
+    --azul:         #7b93ff;
+    --roxo:         #b58cff;
+    --vidro:        rgba(34,28,86,.55);
+    --borda:        rgba(160,140,255,.25);
+    --campo:        rgba(12,10,40,.6);
+    --sombra:       rgba(0,0,0,.5);
+    --brilho-1:     rgba(70,100,255,.38);
+    --brilho-2:     rgba(150,80,255,.36);
+    --degrade-texto: linear-gradient(90deg, #9db0ff, #d2adff);
+    color-scheme: dark;
+  }
+}
+
+
+/* ---------- 2. BASE DA PÁGINA ---------- */
+* {
+  box-sizing: border-box; /* o tamanho inclui padding e borda (mais fácil de calcular) */
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font: 400 16px/1.6 Figtree, system-ui, sans-serif;
+  color: var(--texto);
+  background: var(--fundo);
+  overflow-x: hidden;
+}
+
+/* Manchas de luz azul e roxa que ficam paradas atrás de tudo */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(520px 520px at 8% 6%,   var(--brilho-1), transparent 70%),
+    radial-gradient(560px 560px at 95% 38%, var(--brilho-2), transparent 70%),
+    radial-gradient(520px 520px at 20% 98%, var(--brilho-1), transparent 70%);
+}
+
+
+/* ---------- 3. TOPO ---------- */
+header {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 64px 22px 34px;
+  text-align: center;
+}
+
+.coracao {
+  width: 34px;
+  height: 34px;
+  display: block;
+  margin: 0 auto 14px;
+  filter: drop-shadow(0 6px 14px var(--sombra));
+}
+
+/* Título grande com letras em degradê azul → roxo */
+h1 {
+  font: italic 500 clamp(3rem, 13vw, 5.6rem)/1 "Cormorant Garamond", Georgia, serif;
+  margin: 0;
+  padding: .05em .12em;
+  background: var(--degrade-texto);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  outline: none;
+}
+h1:focus {
+  box-shadow: 0 2px 0 var(--roxo); /* sublinhado quando você clica para editar */
+}
+
+.frase {
+  color: var(--texto-suave);
+  margin: 12px 0 0;
+}
+
+.barra {
+  margin-top: 28px;
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.contador {
+  color: var(--texto-suave);
+  font-size: .95rem;
+}
+
+
+/* ---------- 4. BOTÕES ---------- */
+button {
+  font: 600 1rem Figtree, sans-serif;
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px; /* deixa o botão bem arredondado */
+  padding: 13px 28px;
+}
+
+.botao-principal {
+  color: #fff;
+  background: linear-gradient(90deg, var(--azul), var(--roxo));
+  box-shadow: 0 10px 30px var(--sombra);
+}
+
+.botao-secundario {
+  background: var(--vidro);
+  color: var(--texto);
+  border: 1px solid var(--borda);
+}
+
+/* Contorno visível ao navegar com o teclado (acessibilidade) */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--roxo);
+  outline-offset: 2px;
+}
+
+
+/* ---------- 5. CARTÃO DE CADA LEMBRANÇA ---------- */
+main {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 6px 18px 100px;
+}
+
+.cartao {
+  border-radius: 30px;
+  overflow: hidden; /* corta a foto nos cantos arredondados */
+  background: var(--vidro);
+  border: 1px solid var(--borda);
+  backdrop-filter: blur(18px); /* efeito de vidro fosco */
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 24px 60px var(--sombra);
+}
+
+/* Área da foto */
+.foto {
+  position: relative; /* para podermos colocar o texto "em cima" da foto */
+  aspect-ratio: 4 / 5;
+  max-height: 680px;
+  width: 100%;
+  background: #241d5c;
+}
+.foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* a foto preenche o espaço sem esticar */
+  display: block;
+}
+/* Sombra roxa escura na parte de baixo da foto, para a letra branca aparecer */
+.foto::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(14,8,56,.9) 0%, rgba(40,20,110,.35) 38%, transparent 62%);
+}
+
+/* Data + local + mini local */
+.info {
+  position: absolute; /* fixa embaixo, em cima da foto */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  padding: 26px;
+  color: #fff;
+}
+
+/* Quando a lembrança NÃO tem foto, as informações aparecem normalmente */
+.sem-foto {
+  padding: 30px 26px 6px;
+}
+.sem-foto .info {
+  position: static;
+  padding: 0;
+  color: var(--texto);
+}
+
+.data {
+  display: inline-block;
+  font: 500 .85rem Figtree, sans-serif;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.18);
+  border: 1px solid rgba(255,255,255,.3);
+  margin: 0 0 10px;
+}
+.sem-foto .data {
+  background: var(--campo);
+  border-color: var(--borda);
+  color: var(--roxo);
+}
+
+.local {
+  font: italic 500 clamp(2rem, 8vw, 2.7rem)/1.05 "Cormorant Garamond", Georgia, serif;
+  margin: 0;
+}
+
+.mini-local {
+  margin: 6px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: .9;
+  font-size: .98rem;
+}
+.mini-local svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
+/* Parte de baixo do cartão: o texto que vocês escreveram */
+.conteudo {
+  padding: 22px 26px 20px;
+}
+.texto {
+  white-space: pre-wrap; /* respeita as quebras de linha que você digitou */
+  margin: 0;
+  font: italic 400 1.3rem/1.55 "Cormorant Garamond", Georgia, serif;
+}
+
+/* Botões pequenos "Editar" e "Excluir" */
+.acoes {
+  margin-top: 16px;
+  display: flex;
+  gap: 16px;
+}
+.acoes button {
+  padding: 0;
+  background: none;
+  color: var(--texto-suave);
+  font-size: .88rem;
+  font-weight: 500;
+  border-radius: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Coração que separa uma lembrança da outra */
+.separador {
+  display: flex;
+  justify-content: center;
+  padding: 26px 0;
+}
+.separador svg {
+  width: 20px;
+  height: 20px;
+  opacity: .85;
+}
+
+/* Mensagem de "álbum vazio" */
+.vazio {
+  text-align: center;
+  color: var(--texto-suave);
+  padding: 46px 22px;
+  border: 1.5px dashed var(--borda);
+  border-radius: 28px;
+  background: var(--vidro);
+}
+
+
+/* ---------- 6. JANELA DO FORMULÁRIO ---------- */
+dialog {
+  border: 1px solid var(--borda);
+  border-radius: 26px;
+  padding: 0;
+  width: min(540px, 94vw);
+  max-height: 92vh;
+  background: var(--fundo);
+  color: var(--texto);
+  box-shadow: 0 40px 90px rgba(10,5,60,.55);
+}
+dialog::backdrop { /* o fundo escurecido atrás da janela */
+  background: rgba(12,8,50,.62);
+  backdrop-filter: blur(4px);
+}
+
+form {
+  padding: 26px;
+  display: grid;
+  gap: 14px;
+}
+
+.titulo-janela {
+  font: italic 500 2rem/1.1 "Cormorant Garamond", Georgia, serif;
+  margin: 0;
+  background: var(--degrade-texto);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+label {
+  display: grid;
+  gap: 5px;
+  font-weight: 500;
+  font-size: .9rem;
+  color: var(--texto-suave);
+}
+
+input,
+textarea {
+  font: 400 1rem Figtree, sans-serif;
+  color: var(--texto);
+  background: var(--campo);
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  padding: 11px 13px;
+  width: 100%;
+}
+textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.linha { /* data e local lado a lado */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+#previa { /* miniatura da foto escolhida */
+  display: none; /* o JavaScript mostra quando houver foto */
+  max-height: 210px;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.botoes {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.erro {
+  color: #e0457f;
+  font-size: .9rem;
+  min-height: 1.2em;
+  margin: 0;
+}
+
+
+/* ---------- 7. CELULAR ---------- */
+/* Em telas pequenas, data e local ficam um embaixo do outro */
+@media (max-width: 520px) {
+  .linha {
+    grid-template-columns: 1fr;
+  }
+}
