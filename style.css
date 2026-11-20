@@ -343,6 +343,7 @@ dialog {
   padding: 0;
   width: min(540px, 94vw);
   max-height: 92vh;
+  overflow-y: auto;
   background: var(--fundo);
   color: var(--texto);
   box-shadow: 0 40px 90px rgba(10, 5, 60, .55);
@@ -424,14 +425,6 @@ textarea {
 }
 
 
-/* ---------- 7. CELULAR ---------- */
-/* Em telas pequenas, data e local ficam um embaixo do outro */
-@media (max-width: 520px) {
-  .linha {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* =====================================================
    FOTOS EM 2 COLUNAS
    ===================================================== */
@@ -440,7 +433,7 @@ main {
   max-width: 980px;
   /* mais largo, para caberem 2 cartões lado a lado */
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   /* 2 colunas do mesmo tamanho */
   gap: 22px;
   /* espaço entre os cartões */
@@ -488,34 +481,68 @@ main {
   font-size: 1.1rem;
 }
 
-/* No celular, mantém 2 colunas, só que mais compactas */
+/* ---------- 7. CELULAR ---------- */
+/* Em telas pequenas, o formulário e o álbum se adaptam à largura disponível */
 @media (max-width: 520px) {
+  header {
+    padding: 42px 16px 26px;
+  }
+
+  h1 {
+    font-size: clamp(2.8rem, 14vw, 4rem);
+  }
+
+  .frase {
+    font-size: .95rem;
+  }
+
+  .barra {
+    gap: 10px;
+  }
+
+  .barra button {
+    max-width: 100%;
+  }
+
   main {
-    gap: 12px;
-    padding: 6px 12px 80px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 6px 16px 70px;
   }
 
   .cartao {
-    border-radius: 18px;
+    border-radius: 20px;
   }
 
   .info {
-    padding: 12px;
+    padding: 16px;
   }
 
   .local {
-    font-size: 1.15rem;
+    font-size: clamp(1.6rem, 7vw, 2rem);
   }
 
   .mini-local {
-    font-size: .75rem;
+    font-size: .9rem;
   }
 
   .conteudo {
-    padding: 12px;
+    padding: 16px;
   }
 
   .texto {
-    font-size: .95rem;
+    font-size: 1.05rem;
+  }
+
+  .linha {
+    grid-template-columns: 1fr;
+  }
+
+  form {
+    padding: 20px;
+  }
+
+  .botoes button {
+    flex: 1;
   }
 }
