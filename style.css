@@ -131,6 +131,16 @@ h1:focus {
   font-size: .95rem;
 }
 
+.status {
+  color: var(--texto-suave);
+  font-size: .85rem;
+  margin: 12px 0 0;
+}
+
+.status-erro {
+  color: #e0457f;
+}
+
 
 /* ---------- 4. BOTÕES ---------- */
 button {
@@ -160,6 +170,11 @@ input:focus-visible,
 textarea:focus-visible {
   outline: 3px solid var(--roxo);
   outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: .65;
 }
 
 

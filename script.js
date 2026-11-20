@@ -12,6 +12,7 @@ let banco = null;       // conexão com o "armário" onde as fotos ficam guardad
 let lembrancas = [];    // lista com todas as lembranças carregadas
 let emEdicao = null;    // guarda a lembrança que está sendo editada (ou null se for nova)
 let fotoAtual = null;   // foto escolhida no formulário (em formato de texto/base64)
+let bancoPronto = false;
 
 // Atalho: $("meu-id") é o mesmo que document.getElementById("meu-id")
 const $ = (id) => document.getElementById(id);
@@ -27,36 +28,62 @@ const SEPARADOR = '<div class="separador"><svg viewBox="0 0 24 24" aria-hidden="
 
 // Abre (ou cria) o banco de dados
 function abrirBanco() {
-  return new Promise((resolve) => {
-    try {
-      const pedido = indexedDB.open("album-casal", 1);
-
-      // Roda só na primeira vez: cria as "gavetas" do armário
-      pedido.onupgradeneeded = () => {
-        pedido.result.createObjectStore("entries", { keyPath: "id" }); // gaveta das lembranças
-        pedido.result.createObjectStore("meta");                       // gaveta do título
-      };
-      pedido.onsuccess = () => { banco = pedido.result; resolve(); };
-      pedido.onerror = () => resolve();
-    } catch (erro) {
-      resolve(); // se o navegador não permitir, o álbum funciona, mas sem guardar
+  return new Promise((resolve, reject) => {
+    if (!window.indexedDB) {
+      reject(new Error("Este navegador não permite salvar dados neste álbum."));
+      return;
     }
+
+    let pedido;
+    try {
+      pedido = indexedDB.open("album-casal", 1);
+    } catch (erro) {
+      reject(new Error("Não foi possível abrir o armazenamento do álbum."));
+      return;
+    }
+
+    pedido.onupgradeneeded = () => {
+      const armazenamento = pedido.result;
+      if (!armazenamento.objectStoreNames.contains("entries")) {
+        armazenamento.createObjectStore("entries", { keyPath: "id" });
+      }
+      if (!armazenamento.objectStoreNames.contains("meta")) {
+        armazenamento.createObjectStore("meta");
+      }
+    };
+    pedido.onsuccess = () => {
+      banco = pedido.result;
+      banco.onversionchange = () => banco.close();
+      resolve();
+    };
+    pedido.onerror = () => reject(new Error("Não foi possível abrir o armazenamento do álbum."));
+    pedido.onblocked = () => atualizarStatus("Feche outras abas deste álbum para terminar de carregar.", true);
   });
 }
 
 // Função ajudante: faz uma operação (ler, gravar, apagar) em uma gaveta
 function usarBanco(gaveta, modo, acao) {
-  return new Promise((resolve) => {
-    if (!banco) { resolve(null); return; }
+  return new Promise((resolve, reject) => {
+    if (!banco) {
+      reject(new Error("O armazenamento do álbum ainda não está disponível."));
+      return;
+    }
+
     try {
       const transacao = banco.transaction(gaveta, modo);
       const pedido = acao(transacao.objectStore(gaveta));
       transacao.oncomplete = () => resolve(pedido ? pedido.result : null);
-      transacao.onerror = () => resolve(null);
+      transacao.onerror = () => reject(new Error("O navegador não conseguiu salvar os dados do álbum."));
+      transacao.onabort = () => reject(new Error("O salvamento foi interrompido. Tente novamente."));
     } catch (erro) {
-      resolve(null);
+      reject(new Error("O navegador não conseguiu acessar os dados do álbum."));
     }
   });
+}
+
+function atualizarStatus(mensagem, erro) {
+  $("status").textContent = mensagem;
+  $("status").classList.toggle("status-erro", Boolean(erro));
 }
 
 
@@ -190,8 +217,13 @@ $("campo-foto").onchange = function () {
 };
 
 // Quando clicam em "Guardar"
-$("formulario").onsubmit = function (evento) {
+$("formulario").onsubmit = async function (evento) {
   evento.preventDefault(); // impede a página de recarregar
+
+  if (!bancoPronto) {
+    $("erro").textContent = "O álbum ainda não terminou de carregar. Tente novamente.";
+    return;
+  }
 
   // Monta a lembrança. Se for edição, mantém o mesmo id.
   const item = {
@@ -209,14 +241,20 @@ $("formulario").onsubmit = function (evento) {
     return;
   }
 
-  // Se já existe na lista, substitui; se não, adiciona
+  try {
+    await usarBanco("entries", "readwrite", (gaveta) => gaveta.put(item));
+  } catch (erro) {
+    $("erro").textContent = erro.message;
+    return;
+  }
+
+  // Atualiza a tela somente depois que o navegador confirmar a gravação.
   const posicao = lembrancas.findIndex((x) => x.id === item.id);
   if (posicao >= 0) lembrancas[posicao] = item;
   else lembrancas.push(item);
-
-  usarBanco("entries", "readwrite", (gaveta) => gaveta.put(item)); // guarda no navegador
   mostrarLembrancas();
   $("janela").close();
+  atualizarStatus("Momento salvo neste navegador.");
 };
 
 
@@ -255,17 +293,30 @@ $("lista").onclick = function (evento) {
 
     // 2º toque: apaga de verdade
     const id = Number(botao.dataset.excluir);
-    lembrancas = lembrancas.filter((x) => x.id !== id);
-    usarBanco("entries", "readwrite", (gaveta) => gaveta.delete(id));
-    mostrarLembrancas();
+    usarBanco("entries", "readwrite", (gaveta) => gaveta.delete(id))
+      .then(() => {
+        lembrancas = lembrancas.filter((x) => x.id !== id);
+        mostrarLembrancas();
+        atualizarStatus("Momento excluído.");
+      })
+      .catch((erro) => atualizarStatus(erro.message, true));
   }
 };
 
-// Quando você edita o título, guarda o novo nome
+// Atualiza o título da aba enquanto digita; grava no banco ao sair do campo.
 $("titulo").oninput = function () {
   const nome = this.textContent.trim() || "Nosso álbum";
   document.title = nome;
-  usarBanco("meta", "readwrite", (gaveta) => gaveta.put(nome, "titulo"));
+};
+$("titulo").onblur = function () {
+  const nome = this.textContent.trim() || "Nosso álbum";
+  this.textContent = nome;
+  document.title = nome;
+  if (bancoPronto) {
+    usarBanco("meta", "readwrite", (gaveta) => gaveta.put(nome, "titulo"))
+      .then(() => atualizarStatus("Título salvo neste navegador."))
+      .catch((erro) => atualizarStatus(erro.message, true));
+  }
 };
 // Apertar Enter no título confirma (em vez de pular linha)
 $("titulo").onkeydown = function (evento) {
@@ -278,20 +329,23 @@ $("titulo").onkeydown = function (evento) {
 
 /* ---------- 7. INÍCIO: O QUE ACONTECE AO ABRIR A PÁGINA ---------- */
 
-mostrarLembrancas(); // mostra a tela vazia enquanto carrega
-
-abrirBanco().then(() => {
-  // Carrega as lembranças guardadas
-  usarBanco("entries", "readonly", (gaveta) => gaveta.getAll()).then((salvas) => {
+abrirBanco()
+  .then(() => Promise.all([
+    usarBanco("entries", "readonly", (gaveta) => gaveta.getAll()),
+    usarBanco("meta", "readonly", (gaveta) => gaveta.get("titulo"))
+  ]))
+  .then(([salvas, nome]) => {
     lembrancas = salvas || [];
-    mostrarLembrancas();
-  });
-
-  // Carrega o título que vocês escolheram
-  usarBanco("meta", "readonly", (gaveta) => gaveta.get("titulo")).then((nome) => {
     if (nome) {
       $("titulo").textContent = nome;
       document.title = nome;
     }
+    bancoPronto = true;
+    $("botao-adicionar").disabled = false;
+    mostrarLembrancas();
+    atualizarStatus("Álbum salvo neste navegador. Evite limpar os dados do navegador para não perder as fotos.");
+  })
+  .catch((erro) => {
+    atualizarStatus(erro.message + " Não feche esta página se quiser manter as alterações.", true);
+    $("botao-adicionar").disabled = true;
   });
-});
